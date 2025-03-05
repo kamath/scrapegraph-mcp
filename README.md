@@ -3,6 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/downloads/release/python-3100/)
 [![smithery badge](https://smithery.ai/badge/@ScrapeGraphAI/scrapegraph-mcp)](https://smithery.ai/server/@ScrapeGraphAI/scrapegraph-mcp)
+
 A [Model Context Protocol](https://modelcontextprotocol.io/introduction) (MCP) server that provides access to the [ScapeGraph AI](https://scrapegraphai.com) API. It allows language models to use AI-powered web scraping capabilities.
 
 ## Available Tools
