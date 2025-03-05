@@ -33,7 +33,7 @@ npx -y @smithery/cli install @ScrapeGraphAI/scrapegraph-mcp --client claude
 
 ### Claude Desktop Configuration
 
-Update your Claude Desktop configuration file with the following settings:
+Update your Claude Desktop configuration file with the following settings (located on the top rigth of the Cursor page):
 
 (remember to add your API key inside the config)
 
