@@ -1,8 +1,8 @@
-# ScapeGraph MCP Server
+# ScrapeGraph MCP Server
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/downloads/release/python-3100/)
-[![smithery badge](https://smithery.ai/badge/@scrapegraphai/scrapegraph-mcp)](https://smithery.ai/server/@scrapegraphai/scrapegraph-mcp)
+[![smithery badge](https://smithery.ai/badge/@ScrapeGraphAI/scrapegraph-mcp)](https://smithery.ai/server/@ScrapeGraphAI/scrapegraph-mcp)
 A [Model Context Protocol](https://modelcontextprotocol.io/introduction) (MCP) server that provides access to the [ScapeGraph AI](https://scrapegraphai.com) API. It allows language models to use AI-powered web scraping capabilities.
 
 ## Available Tools
@@ -22,10 +22,10 @@ You'll need a ScapeGraph API key to use this server. You can obtain one by:
 
 ### Installing via Smithery
 
-To install Oura API Integration Server for Claude Desktop automatically via [Smithery](https://smithery.ai/server/@scrapegraphai/scrapegraph-mcp):
+To install ScrapeGraph API Integration Server for Claude Desktop automatically via [Smithery](https://smithery.ai/server/@ScrapeGraphAI/scrapegraph-mcp):
 
 ```bash
-npx -y @smithery/cli install @scrapegraphai/scrapegraph-mcp --client claude
+npx -y @smithery/cli install @ScrapeGraphAI/scrapegraph-mcp --client claude
 ```
 
 ### Claude for Desktop
