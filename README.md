@@ -1,5 +1,7 @@
 # ScrapeGraph MCP Server
 
+![ScapeGraph Smithery Integration](assets/sgai_smithery.png)
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/downloads/release/python-3100/)
 [![smithery badge](https://smithery.ai/badge/@ScrapeGraphAI/scrapegraph-mcp)](https://smithery.ai/server/@ScrapeGraphAI/scrapegraph-mcp)
@@ -54,6 +56,12 @@ Update your Claude Desktop configuration file with the following settings:
 The configuration file is located at:
 - Windows: `%APPDATA%/Claude/claude_desktop_config.json`
 - macOS: `~/Library/Application\ Support/Claude/claude_desktop_config.json`
+
+### Cursor Integration
+
+Add the ScrapeGraphAI MCP server on the settings:
+
+![Cursor MCP Integration](assets/cursor_mcp.png)
 
 ## Example Use Cases
 
