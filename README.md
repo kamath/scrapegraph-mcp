@@ -4,69 +4,90 @@
 [![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/downloads/release/python-3100/)
 [![smithery badge](https://smithery.ai/badge/@ScrapeGraphAI/scrapegraph-mcp)](https://smithery.ai/server/@ScrapeGraphAI/scrapegraph-mcp)
 
-A [Model Context Protocol](https://modelcontextprotocol.io/introduction) (MCP) server that provides access to the [ScapeGraph AI](https://scrapegraphai.com) API. It allows language models to use AI-powered web scraping capabilities.
+A production-ready [Model Context Protocol](https://modelcontextprotocol.io/introduction) (MCP) server that provides seamless integration with the [ScapeGraph AI](https://scrapegraphai.com) API. This server enables language models to leverage advanced AI-powered web scraping capabilities with enterprise-grade reliability.
 
 ## Available Tools
 
-The server exposes the following tools:
+The server provides the following enterprise-ready tools:
 
-- `markdownify(website_url: str)`: Convert any webpage into clean, formatted markdown
-- `smartscraper(user_prompt: str, website_url: str)`: Extract structured data from any webpage using AI
-- `searchscraper(user_prompt: str)`: Perform AI-powered web searches with structured results
+- `markdownify(website_url: str)`: Transform any webpage into clean, structured markdown format
+- `smartscraper(user_prompt: str, website_url: str)`: Leverage AI to extract structured data from any webpage
+- `searchscraper(user_prompt: str)`: Execute AI-powered web searches with structured, actionable results
 
-## Usage
+## Setup Instructions
 
-You'll need a ScapeGraph API key to use this server. You can obtain one by:
+To utilize this server, you'll need a ScapeGraph API key. Follow these steps to obtain one:
 
-1. Going to the [ScapeGraph Dashboard](https://dashboard.scrapegraphai.com)
-2. Creating an account and obtaining an API key
+1. Navigate to the [ScapeGraph Dashboard](https://dashboard.scrapegraphai.com)
+2. Create an account and generate your API key
 
-### Installing via Smithery
+### Automated Installation via Smithery
 
-To install ScrapeGraph API Integration Server for Claude Desktop automatically via [Smithery](https://smithery.ai/server/@ScrapeGraphAI/scrapegraph-mcp):
+For automated installation of the ScrapeGraph API Integration Server using [Smithery](https://smithery.ai/server/@ScrapeGraphAI/scrapegraph-mcp):
 
 ```bash
 npx -y @smithery/cli install @ScrapeGraphAI/scrapegraph-mcp --client claude
 ```
 
-### Claude for Desktop
+### Claude Desktop Configuration
 
-Update your `claude_desktop_config.json` (located in `~/Library/Application\ Support/Claude/claude_desktop_config.json` on macOS and `%APPDATA%/Claude/claude_desktop_config.json` on Windows) to include the following:
+Update your Claude Desktop configuration file with the following settings:
 
 ```json
 {
     "mcpServers": {
-        "scrapegraph": {
-            "command": "uvx",
+        "@ScrapeGraphAI-scrapegraph-mcp": {
+            "command": "npx",
             "args": [
-                "scrapegraph_mcp"
-            ],
-            "env": {
-                "SGAI_API_KEY": "YOUR_SCRAPEGRAPH_API_KEY"
-            }
+                "-y",
+                "@smithery/cli@latest",
+                "run",
+                "@ScrapeGraphAI/scrapegraph-mcp",
+                "--config",
+                "\"{\\\"scrapegraphApiKey\\\":\\\"sgai-123456\\\"}\""
+            ]
         }
     }
 }
 ```
 
-## Example Queries
+The configuration file is located at:
+- Windows: `%APPDATA%/Claude/claude_desktop_config.json`
+- macOS: `~/Library/Application\ Support/Claude/claude_desktop_config.json`
 
-Once connected, you can ask Claude questions like:
+## Example Use Cases
 
-- "What are the main features of the ScapeGraph API?"
-- "Convert the ScapeGraph homepage into markdown"
-- "Extract the pricing information from the ScapeGraph website"
-- "Find information about the latest advancements in AI-powered web scraping"
-- "Summarize the content of the Python documentation website"
+The server enables sophisticated queries such as:
+
+- "Analyze and extract the main features of the ScapeGraph API"
+- "Generate a structured markdown version of the ScapeGraph homepage"
+- "Extract and analyze pricing information from the ScapeGraph website"
+- "Research and summarize recent developments in AI-powered web scraping"
+- "Create a comprehensive summary of the Python documentation website"
 
 ## Error Handling
 
-The server provides human-readable error messages for common issues:
+The server implements robust error handling with detailed, actionable error messages for:
 
-- API authentication errors
-- Invalid URL formats
-- Network connectivity problems
+- API authentication issues
+- Malformed URL structures
+- Network connectivity failures
+- Rate limiting and quota management
+
+## Common Issues
+
+### Windows-Specific Connection
+
+When running on Windows systems, you may need to use the following command to connect to the MCP server:
+
+```bash
+C:\Windows\System32\cmd.exe /c npx -y @smithery/cli@latest run @ScrapeGraphAI/scrapegraph-mcp --config "{\"scrapegraphApiKey\":\"sgai-123456\"}"
+```
+
+This ensures proper execution in the Windows environment.
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details. 
+This project is distributed under the MIT License. For detailed terms and conditions, please refer to the LICENSE file.
+
+Made with ❤️ by ScrapeGraphAI Team
