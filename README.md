@@ -35,6 +35,8 @@ npx -y @smithery/cli install @ScrapeGraphAI/scrapegraph-mcp --client claude
 
 Update your Claude Desktop configuration file with the following settings:
 
+(remember to add your API key inside the config)
+
 ```json
 {
     "mcpServers": {
