@@ -46,7 +46,7 @@ Update your Claude Desktop configuration file with the following settings:
                 "run",
                 "@ScrapeGraphAI/scrapegraph-mcp",
                 "--config",
-                "\"{\\\"scrapegraphApiKey\\\":\\\"sgai-123456\\\"}\""
+                "\"{\\\"scrapegraphApiKey\\\":\\\"YOUR-SGAI-API-KEY\\\"}\""
             ]
         }
     }
@@ -89,7 +89,7 @@ The server implements robust error handling with detailed, actionable error mess
 When running on Windows systems, you may need to use the following command to connect to the MCP server:
 
 ```bash
-C:\Windows\System32\cmd.exe /c npx -y @smithery/cli@latest run @ScrapeGraphAI/scrapegraph-mcp --config "{\"scrapegraphApiKey\":\"sgai-123456\"}"
+C:\Windows\System32\cmd.exe /c npx -y @smithery/cli@latest run @ScrapeGraphAI/scrapegraph-mcp --config "{\"scrapegraphApiKey\":\"YOUR-SGAI-API-KEY\"}"
 ```
 
 This ensures proper execution in the Windows environment.
