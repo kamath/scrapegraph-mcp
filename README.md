@@ -102,4 +102,4 @@ This project is distributed under the MIT License. For detailed terms and condit
 
 Special thanks to [tomekkorbak](https://github.com/tomekkorbak) for his implementation of [oura-mcp-server](https://github.com/tomekkorbak/oura-mcp-server), which served as starting point for this repo.
 
-Made with ❤️ by ScrapeGraphAI Team
+Made with ❤️ by [ScrapeGraphAI](https://scrapegraphai.com) Team
