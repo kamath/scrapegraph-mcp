@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/scrapegraphai-scrapegraph-mcp-badge.png)](https://mseep.ai/app/scrapegraphai-scrapegraph-mcp)
+
 # ScrapeGraph MCP Server
 
 ![ScapeGraph Smithery Integration](assets/sgai_smithery.png)
