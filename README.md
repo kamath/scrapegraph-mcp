@@ -1,5 +1,3 @@
-[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/scrapegraphai-scrapegraph-mcp-badge.png)](https://mseep.ai/app/scrapegraphai-scrapegraph-mcp)
-
 # ScrapeGraph MCP Server
 
 ![ScapeGraph Smithery Integration](assets/sgai_smithery.png)
@@ -13,6 +11,7 @@
 [![smithery badge](https://smithery.ai/badge/@ScrapeGraphAI/scrapegraph-mcp)](https://smithery.ai/server/@ScrapeGraphAI/scrapegraph-mcp)
 
 A production-ready [Model Context Protocol](https://modelcontextprotocol.io/introduction) (MCP) server that provides seamless integration with the [ScapeGraph AI](https://scrapegraphai.com) API. This server enables language models to leverage advanced AI-powered web scraping capabilities with enterprise-grade reliability.
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/scrapegraphai-scrapegraph-mcp-badge.png)](https://mseep.ai/app/scrapegraphai-scrapegraph-mcp)
 
 ## Available Tools
 
