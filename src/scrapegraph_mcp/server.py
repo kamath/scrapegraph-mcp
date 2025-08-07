@@ -5,6 +5,7 @@ This server exposes methods to use ScapeGraph's AI-powered web scraping services
 - markdownify: Convert any webpage into clean, formatted markdown
 - smartscraper: Extract structured data from any webpage using AI
 - searchscraper: Perform AI-powered web searches with structured results
+- crawl: Perform intelligent web crawling with AI-powered data extraction
 """
 
 import os
@@ -56,22 +57,32 @@ class ScapeGraphClient:
 
         return response.json()
 
-    def smartscraper(self, user_prompt: str, website_url: str) -> Dict[str, Any]:
+    def smartscraper(self, user_prompt: str, website_url: str, number_of_scrolls: int = None, markdown_only: bool = None) -> Dict[str, Any]:
         """
         Extract structured data from a webpage using AI.
 
         Args:
             user_prompt: Instructions for what data to extract
             website_url: URL of the webpage to scrape
+            number_of_scrolls: Number of infinite scrolls to perform (optional)
+            markdown_only: Whether to return only markdown content without AI processing (optional)
 
         Returns:
-            Dictionary containing the extracted data
+            Dictionary containing the extracted data or markdown content
         """
         url = f"{self.BASE_URL}/smartscraper"
         data = {
             "user_prompt": user_prompt,
             "website_url": website_url
         }
+        
+        # Add number_of_scrolls to the request if provided
+        if number_of_scrolls is not None:
+            data["number_of_scrolls"] = number_of_scrolls
+            
+        # Add markdown_only to the request if provided
+        if markdown_only is not None:
+            data["markdown_only"] = markdown_only
 
         response = self.client.post(url, headers=self.headers, json=data)
 
@@ -81,12 +92,14 @@ class ScapeGraphClient:
 
         return response.json()
 
-    def searchscraper(self, user_prompt: str) -> Dict[str, Any]:
+    def searchscraper(self, user_prompt: str, num_results: int = None, number_of_scrolls: int = None) -> Dict[str, Any]:
         """
         Perform AI-powered web searches with structured results.
 
         Args:
             user_prompt: Search query or instructions
+            num_results: Number of websites to search (optional, default: 3 websites = 30 credits)
+            number_of_scrolls: Number of infinite scrolls to perform on each website (optional)
 
         Returns:
             Dictionary containing search results and reference URLs
@@ -95,8 +108,68 @@ class ScapeGraphClient:
         data = {
             "user_prompt": user_prompt
         }
+        
+        # Add num_results to the request if provided
+        if num_results is not None:
+            data["num_results"] = num_results
+            
+        # Add number_of_scrolls to the request if provided
+        if number_of_scrolls is not None:
+            data["number_of_scrolls"] = number_of_scrolls
 
         response = self.client.post(url, headers=self.headers, json=data)
+
+        if response.status_code != 200:
+            error_msg = f"Error {response.status_code}: {response.text}"
+            raise Exception(error_msg)
+
+        return response.json()
+
+    def crawl(
+        self, 
+        url: str, 
+        prompt: str = None, 
+        cache_website: bool = None,
+        depth: int = None,
+        max_pages: int = None,
+        same_domain_only: bool = None,
+        markdown_only: bool = None
+    ) -> Dict[str, Any]:
+        """
+        Perform intelligent web crawling with AI-powered data extraction.
+
+        Args:
+            url: Starting URL to crawl
+            prompt: AI prompt for data extraction (optional, if not provided returns markdown only)
+            cache_website: Whether to cache the website content (optional)
+            depth: Maximum crawling depth (optional)
+            max_pages: Maximum number of pages to crawl (optional)
+            same_domain_only: Whether to crawl only within the same domain (optional)
+            markdown_only: Whether to return only markdown content without AI processing (optional)
+
+        Returns:
+            Dictionary containing the crawl results
+        """
+        endpoint = f"{self.BASE_URL}/crawl"
+        data = {
+            "url": url
+        }
+        
+        # Add optional parameters if provided
+        if prompt is not None:
+            data["prompt"] = prompt
+        if cache_website is not None:
+            data["cache_website"] = cache_website
+        if depth is not None:
+            data["depth"] = depth
+        if max_pages is not None:
+            data["max_pages"] = max_pages
+        if same_domain_only is not None:
+            data["same_domain_only"] = same_domain_only
+        if markdown_only is not None:
+            data["markdown_only"] = markdown_only
+
+        response = self.client.post(endpoint, headers=self.headers, json=data)
 
         if response.status_code != 200:
             error_msg = f"Error {response.status_code}: {response.text}"
@@ -142,7 +215,9 @@ def markdownify(website_url: str) -> Dict[str, Any]:
 @mcp.tool()
 def smartscraper(
     user_prompt: str, 
-    website_url: str
+    website_url: str,
+    number_of_scrolls: int = None,
+    markdown_only: bool = None
 ) -> Dict[str, Any]:
     """
     Extract structured data from a webpage using AI.
@@ -150,15 +225,17 @@ def smartscraper(
     Args:
         user_prompt: Instructions for what data to extract
         website_url: URL of the webpage to scrape
+        number_of_scrolls: Number of infinite scrolls to perform (optional)
+        markdown_only: Whether to return only markdown content without AI processing (optional)
 
     Returns:
-        Dictionary containing the extracted data
+        Dictionary containing the extracted data or markdown content
     """
     if scrapegraph_client is None:
         return {"error": "ScapeGraph client not initialized. Please provide an API key."}
 
     try:
-        return scrapegraph_client.smartscraper(user_prompt, website_url)
+        return scrapegraph_client.smartscraper(user_prompt, website_url, number_of_scrolls, markdown_only)
     except Exception as e:
         return {"error": str(e)}
 
@@ -166,13 +243,17 @@ def smartscraper(
 # Add tool for searchscraper
 @mcp.tool()
 def searchscraper(
-    user_prompt: str
+    user_prompt: str,
+    num_results: int = None,
+    number_of_scrolls: int = None
 ) -> Dict[str, Any]:
     """
     Perform AI-powered web searches with structured results.
 
     Args:
         user_prompt: Search query or instructions
+        num_results: Number of websites to search (optional, default: 3 websites = 30 credits)
+        number_of_scrolls: Number of infinite scrolls to perform on each website (optional)
 
     Returns:
         Dictionary containing search results and reference URLs
@@ -181,7 +262,50 @@ def searchscraper(
         return {"error": "ScapeGraph client not initialized. Please provide an API key."}
 
     try:
-        return scrapegraph_client.searchscraper(user_prompt)
+        return scrapegraph_client.searchscraper(user_prompt, num_results, number_of_scrolls)
+    except Exception as e:
+        return {"error": str(e)}
+
+
+# Add tool for crawl (smartcrawler)
+@mcp.tool()
+def crawl(
+    url: str,
+    prompt: str = None,
+    cache_website: bool = None,
+    depth: int = None,
+    max_pages: int = None,
+    same_domain_only: bool = None,
+    markdown_only: bool = None
+) -> Dict[str, Any]:
+    """
+    Perform intelligent web crawling with AI-powered data extraction.
+
+    Args:
+        url: Starting URL to crawl
+        prompt: AI prompt for data extraction (optional, if not provided returns markdown only)
+        cache_website: Whether to cache the website content (optional)
+        depth: Maximum crawling depth (optional)
+        max_pages: Maximum number of pages to crawl (optional)
+        same_domain_only: Whether to crawl only within the same domain (optional)
+        markdown_only: Whether to return only markdown content without AI processing (optional)
+
+    Returns:
+        Dictionary containing the crawl results
+    """
+    if scrapegraph_client is None:
+        return {"error": "ScapeGraph client not initialized. Please provide an API key."}
+
+    try:
+        return scrapegraph_client.crawl(
+            url=url,
+            prompt=prompt,
+            cache_website=cache_website,
+            depth=depth,
+            max_pages=max_pages,
+            same_domain_only=same_domain_only,
+            markdown_only=markdown_only
+        )
     except Exception as e:
         return {"error": str(e)}
 
