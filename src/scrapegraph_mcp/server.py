@@ -5,7 +5,8 @@ This server exposes methods to use ScapeGraph's AI-powered web scraping services
 - markdownify: Convert any webpage into clean, formatted markdown
 - smartscraper: Extract structured data from any webpage using AI
 - searchscraper: Perform AI-powered web searches with structured results
-- crawl: Perform intelligent web crawling with AI-powered data extraction
+- crawl_requester: Initiate intelligent web crawling requests (step 1)
+- crawl_fetcher: Fetch results from crawling requests (step 2)
 """
 
 import os
@@ -125,7 +126,7 @@ class ScapeGraphClient:
 
         return response.json()
 
-    def crawl(
+    def crawl_requester(
         self, 
         url: str, 
         prompt: str = None, 
@@ -136,7 +137,7 @@ class ScapeGraphClient:
         markdown_only: bool = None
     ) -> Dict[str, Any]:
         """
-        Perform intelligent web crawling with AI-powered data extraction.
+        Initiate a web crawling request and get a request ID.
 
         Args:
             url: Starting URL to crawl
@@ -148,9 +149,9 @@ class ScapeGraphClient:
             markdown_only: Whether to return only markdown content without AI processing (optional)
 
         Returns:
-            Dictionary containing the crawl results
+            Dictionary containing the request ID and status
         """
-        endpoint = f"{self.BASE_URL}/crawl"
+        endpoint = f"{self.BASE_URL}/crawl/requester"
         data = {
             "url": url
         }
@@ -168,6 +169,29 @@ class ScapeGraphClient:
             data["same_domain_only"] = same_domain_only
         if markdown_only is not None:
             data["markdown_only"] = markdown_only
+
+        response = self.client.post(endpoint, headers=self.headers, json=data)
+
+        if response.status_code != 200:
+            error_msg = f"Error {response.status_code}: {response.text}"
+            raise Exception(error_msg)
+
+        return response.json()
+
+    def crawl_fetcher(self, request_id: str) -> Dict[str, Any]:
+        """
+        Fetch the results of a crawling request using the request ID.
+
+        Args:
+            request_id: The request ID returned by crawl_requester
+
+        Returns:
+            Dictionary containing the crawl results or status
+        """
+        endpoint = f"{self.BASE_URL}/crawl/fetcher"
+        data = {
+            "request_id": request_id
+        }
 
         response = self.client.post(endpoint, headers=self.headers, json=data)
 
@@ -267,9 +291,9 @@ def searchscraper(
         return {"error": str(e)}
 
 
-# Add tool for crawl (smartcrawler)
+# Add tool for crawl requester (smartcrawler step 1)
 @mcp.tool()
-def crawl(
+def crawl_requester(
     url: str,
     prompt: str = None,
     cache_website: bool = None,
@@ -279,7 +303,7 @@ def crawl(
     markdown_only: bool = None
 ) -> Dict[str, Any]:
     """
-    Perform intelligent web crawling with AI-powered data extraction.
+    Initiate a web crawling request and get a request ID.
 
     Args:
         url: Starting URL to crawl
@@ -291,13 +315,13 @@ def crawl(
         markdown_only: Whether to return only markdown content without AI processing (optional)
 
     Returns:
-        Dictionary containing the crawl results
+        Dictionary containing the request ID and status
     """
     if scrapegraph_client is None:
         return {"error": "ScapeGraph client not initialized. Please provide an API key."}
 
     try:
-        return scrapegraph_client.crawl(
+        return scrapegraph_client.crawl_requester(
             url=url,
             prompt=prompt,
             cache_website=cache_website,
@@ -306,6 +330,27 @@ def crawl(
             same_domain_only=same_domain_only,
             markdown_only=markdown_only
         )
+    except Exception as e:
+        return {"error": str(e)}
+
+
+# Add tool for crawl fetcher (smartcrawler step 2)
+@mcp.tool()
+def crawl_fetcher(request_id: str) -> Dict[str, Any]:
+    """
+    Fetch the results of a crawling request using the request ID.
+
+    Args:
+        request_id: The request ID returned by crawl_requester
+
+    Returns:
+        Dictionary containing the crawl results or status
+    """
+    if scrapegraph_client is None:
+        return {"error": "ScapeGraph client not initialized. Please provide an API key."}
+
+    try:
+        return scrapegraph_client.crawl_fetcher(request_id)
     except Exception as e:
         return {"error": str(e)}
 
