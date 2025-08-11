@@ -166,8 +166,12 @@ class ScapeGraphClient:
         # Handle extraction mode
         if extraction_mode == "markdown":
             data["markdown_only"] = True
-        elif prompt is not None:
+        elif extraction_mode == "ai":
+            if prompt is None:
+                raise ValueError("prompt is required when extraction_mode is 'ai'")
             data["prompt"] = prompt
+        else:
+            raise ValueError(f"Invalid extraction_mode: {extraction_mode}. Must be 'ai' or 'markdown'")
         if depth is not None:
             data["depth"] = depth
         if max_pages is not None:
