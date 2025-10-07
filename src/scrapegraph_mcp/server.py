@@ -13,7 +13,7 @@ import os
 from typing import Any, Dict
 
 import httpx
-from mcp.server.fastmcp import FastMCP
+from fastmcp import FastMCP
 
 
 class ScapeGraphClient:
