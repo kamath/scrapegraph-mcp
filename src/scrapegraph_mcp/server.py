@@ -10,7 +10,8 @@ This server exposes methods to use ScapeGraph's AI-powered web scraping services
 """
 
 import os
-from typing import Any, Dict
+import json
+from typing import Any, Dict, Optional, List, Union
 
 import httpx
 from fastmcp import FastMCP
@@ -33,7 +34,7 @@ class ScapeGraphClient:
             "SGAI-APIKEY": api_key,
             "Content-Type": "application/json"
         }
-        self.client = httpx.Client(timeout=60.0)
+        self.client = httpx.Client(timeout=httpx.Timeout(120.0))
 
     def markdownify(self, website_url: str) -> Dict[str, Any]:
         """
@@ -124,6 +125,85 @@ class ScapeGraphClient:
             error_msg = f"Error {response.status_code}: {response.text}"
             raise Exception(error_msg)
 
+        return response.json()
+
+    def scrape(self, website_url: str, render_heavy_js: Optional[bool] = None) -> Dict[str, Any]:
+        """
+        Basic scrape endpoint to fetch page content.
+
+        Args:
+            website_url: URL to scrape
+            render_heavy_js: Whether to render heavy JS (optional)
+
+        Returns:
+            Dictionary containing the scraped result
+        """
+        url = f"{self.BASE_URL}/scrape"
+        payload: Dict[str, Any] = {"website_url": website_url}
+        if render_heavy_js is not None:
+            payload["render_heavy_js"] = render_heavy_js
+
+        response = self.client.post(url, headers=self.headers, json=payload)
+        response.raise_for_status()
+        return response.json()
+
+    def sitemap(self, website_url: str) -> Dict[str, Any]:
+        """
+        Extract sitemap for a given website.
+
+        Args:
+            website_url: Base website URL
+
+        Returns:
+            Dictionary containing sitemap URLs/structure
+        """
+        url = f"{self.BASE_URL}/sitemap"
+        payload: Dict[str, Any] = {"website_url": website_url}
+
+        response = self.client.post(url, headers=self.headers, json=payload)
+        response.raise_for_status()
+        return response.json()
+
+    def agentic_scrapper(
+        self,
+        url: str,
+        user_prompt: Optional[str] = None,
+        output_schema: Optional[Dict[str, Any]] = None,
+        steps: Optional[List[str]] = None,
+        ai_extraction: Optional[bool] = None,
+        persistent_session: Optional[bool] = None,
+        timeout_seconds: Optional[float] = None,
+    ) -> Dict[str, Any]:
+        """
+        Run the Agentic Scraper workflow (no live session/browser interaction).
+
+        Args:
+            url: Target website URL
+            user_prompt: Instructions for what to do/extract (optional)
+            output_schema: Desired structured output schema (optional)
+            steps: High-level steps/instructions for the agent (optional)
+            ai_extraction: Whether to enable AI extraction mode (optional)
+            persistent_session: Whether to keep session alive between steps (optional)
+            timeout_seconds: Per-request timeout override in seconds (optional)
+        """
+        endpoint = f"{self.BASE_URL}/agentic-scrapper"
+        payload: Dict[str, Any] = {"url": url}
+        if user_prompt is not None:
+            payload["user_prompt"] = user_prompt
+        if output_schema is not None:
+            payload["output_schema"] = output_schema
+        if steps is not None:
+            payload["steps"] = steps
+        if ai_extraction is not None:
+            payload["ai_extraction"] = ai_extraction
+        if persistent_session is not None:
+            payload["persistent_session"] = persistent_session
+
+        if timeout_seconds is not None:
+            response = self.client.post(endpoint, headers=self.headers, json=payload, timeout=timeout_seconds)
+        else:
+            response = self.client.post(endpoint, headers=self.headers, json=payload)
+        response.raise_for_status()
         return response.json()
 
     def smartcrawler_initiate(
@@ -369,6 +449,110 @@ def smartcrawler_fetch_results(request_id: str) -> Dict[str, Any]:
         return scrapegraph_client.smartcrawler_fetch_results(request_id)
     except Exception as e:
         return {"error": str(e)}
+
+
+# Add tool for basic scrape
+@mcp.tool()
+def scrape(website_url: str, render_heavy_js: Optional[bool] = None) -> Dict[str, Any]:
+    """
+    Fetch page content for a URL.
+
+    Args:
+        website_url: URL to scrape
+        render_heavy_js: Whether to render heavy JS (optional)
+    """
+    if scrapegraph_client is None:
+        return {"error": "ScapeGraph client not initialized. Please provide an API key."}
+
+    try:
+        return scrapegraph_client.scrape(website_url=website_url, render_heavy_js=render_heavy_js)
+    except httpx.HTTPError as http_err:
+        return {"error": str(http_err)}
+    except ValueError as val_err:
+        return {"error": str(val_err)}
+
+
+# Add tool for sitemap extraction
+@mcp.tool()
+def sitemap(website_url: str) -> Dict[str, Any]:
+    """
+    Extract sitemap for a website.
+
+    Args:
+        website_url: Base website URL
+    """
+    if scrapegraph_client is None:
+        return {"error": "ScapeGraph client not initialized. Please provide an API key."}
+
+    try:
+        return scrapegraph_client.sitemap(website_url=website_url)
+    except httpx.HTTPError as http_err:
+        return {"error": str(http_err)}
+    except ValueError as val_err:
+        return {"error": str(val_err)}
+
+
+# Add tool for Agentic Scraper (no live session/browser interaction)
+@mcp.tool()
+def agentic_scrapper(
+    url: str,
+    user_prompt: Optional[str] = None,
+    output_schema: Optional[Union[str, Dict[str, Any]]] = None,
+    steps: Optional[Union[str, List[str]]] = None,
+    ai_extraction: Optional[bool] = None,
+    persistent_session: Optional[bool] = None,
+    timeout_seconds: Optional[float] = None,
+) -> Dict[str, Any]:
+    """
+    Run the Agentic Scraper workflow. Accepts flexible input forms for steps and schema.
+    """
+    if scrapegraph_client is None:
+        return {"error": "ScapeGraph client not initialized. Please provide an API key."}
+
+    # Normalize inputs
+    normalized_steps: Optional[List[str]] = None
+    if isinstance(steps, list):
+        normalized_steps = steps
+    elif isinstance(steps, str):
+        parsed_steps: Optional[Any] = None
+        try:
+            parsed_steps = json.loads(steps)
+        except json.JSONDecodeError:
+            parsed_steps = None
+        if isinstance(parsed_steps, list):
+            normalized_steps = parsed_steps
+        else:
+            normalized_steps = [steps]
+
+    normalized_schema: Optional[Dict[str, Any]] = None
+    if isinstance(output_schema, dict):
+        normalized_schema = output_schema
+    elif isinstance(output_schema, str):
+        try:
+            parsed_schema = json.loads(output_schema)
+            if isinstance(parsed_schema, dict):
+                normalized_schema = parsed_schema
+            else:
+                return {"error": "output_schema must be a JSON object"}
+        except json.JSONDecodeError as e:
+            return {"error": f"Invalid JSON for output_schema: {str(e)}"}
+
+    try:
+        return scrapegraph_client.agentic_scrapper(
+            url=url,
+            user_prompt=user_prompt,
+            output_schema=normalized_schema,
+            steps=normalized_steps,
+            ai_extraction=ai_extraction,
+            persistent_session=persistent_session,
+            timeout_seconds=timeout_seconds,
+        )
+    except httpx.TimeoutException as timeout_err:
+        return {"error": f"Request timed out: {str(timeout_err)}"}
+    except httpx.HTTPError as http_err:
+        return {"error": str(http_err)}
+    except ValueError as val_err:
+        return {"error": str(val_err)}
 
 
 def main() -> None:
