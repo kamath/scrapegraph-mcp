@@ -35,7 +35,7 @@ class ScapeGraphClient:
         """
         self.api_key = api_key
         self.headers = {
-            "SGAI-APIKEY": api_key,
+            "SGAI_API_KEY": api_key,
             "Content-Type": "application/json"
         }
         self.client = httpx.Client(timeout=httpx.Timeout(120.0))
