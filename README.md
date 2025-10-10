@@ -20,9 +20,27 @@ A production-ready [Model Context Protocol](https://modelcontextprotocol.io/intr
 
 The server provides the following enterprise-ready tools:
 
+### Core Scraping Tools
+
 - `markdownify(website_url: str)`: Transform any webpage into clean, structured markdown format
-- `smartscraper(user_prompt: str, website_url: str)`: Leverage AI to extract structured data from any webpage
-- `searchscraper(user_prompt: str)`: Execute AI-powered web searches with structured, actionable results
+- `smartscraper(user_prompt: str, website_url: str, number_of_scrolls: int = None, markdown_only: bool = None)`: Leverage AI to extract structured data from any webpage with support for infinite scrolling
+- `searchscraper(user_prompt: str, num_results: int = None, number_of_scrolls: int = None)`: Execute AI-powered web searches with structured, actionable results
+
+### Advanced Scraping Tools
+
+- `scrape(website_url: str, render_heavy_js: bool = None)`: Basic scraping endpoint to fetch page content with optional heavy JavaScript rendering
+- `sitemap(website_url: str)`: Extract sitemap URLs and structure for any website
+
+### Multi-Page Crawling
+
+- `smartcrawler_initiate(url: str, prompt: str = None, extraction_mode: str = "ai", depth: int = None, max_pages: int = None, same_domain_only: bool = None)`: Initiate intelligent multi-page web crawling with two modes:
+  - **AI Extraction Mode** (10 credits per page): Extracts structured data based on your prompt
+  - **Markdown Conversion Mode** (2 credits per page): Converts pages to clean markdown
+- `smartcrawler_fetch_results(request_id: str)`: Retrieve results from asynchronous crawling operations
+
+### Intelligent Agent-Based Scraping
+
+- `agentic_scrapper(url: str, user_prompt: str = None, output_schema: dict = None, steps: list = None, ai_extraction: bool = None, persistent_session: bool = None, timeout_seconds: float = None)`: Run advanced agentic scraping workflows with customizable steps and structured output schemas
 
 ## Setup Instructions
 
@@ -77,11 +95,25 @@ Add the ScrapeGraphAI MCP server on the settings:
 
 The server enables sophisticated queries such as:
 
+### Single Page Scraping
 - "Analyze and extract the main features of the ScapeGraph API"
 - "Generate a structured markdown version of the ScapeGraph homepage"
-- "Extract and analyze pricing information from the ScapeGraph website"
+- "Extract and analyze pricing information from the ScapeGraph website with infinite scroll support"
+- "Scrape this JavaScript-heavy page with full rendering"
+
+### Search and Research
 - "Research and summarize recent developments in AI-powered web scraping"
-- "Create a comprehensive summary of the Python documentation website"
+- "Search for the top 5 articles about machine learning frameworks and extract key points"
+
+### Multi-Page Crawling
+- "Crawl the entire documentation site and convert all pages to markdown"
+- "Extract all product information from an e-commerce site up to 3 levels deep"
+- "Crawl a blog and extract all article titles, authors, and summaries"
+
+### Advanced Agentic Scraping
+- "Navigate through a multi-step form and extract the final results"
+- "Follow pagination links and compile a complete dataset"
+- "Execute a complex workflow with custom extraction schema"
 
 ## Error Handling
 
