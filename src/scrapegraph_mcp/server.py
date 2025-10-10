@@ -14,8 +14,11 @@ import json
 from typing import Any, Dict, Optional, List, Union
 
 import httpx
+import uvicorn
 from fastmcp import FastMCP
 from smithery.decorators import smithery
+from pydantic import BaseModel, Field
+from starlette.middleware.cors import CORSMiddleware
 
 
 class ScapeGraphClient:
@@ -302,12 +305,45 @@ class ScapeGraphClient:
         self.client.close()
 
 
+# Pydantic configuration schema for Smithery
+class ConfigSchema(BaseModel):
+    api_key: str = Field(description="Your Scrapegraph API key")
+
+
 # Create MCP server
 mcp = FastMCP("ScapeGraph API MCP Server")
 
 # Default API key (will be overridden in main or by direct assignment)
 default_api_key = os.environ.get("SGAI_API_KEY")
 scrapegraph_client = ScapeGraphClient(default_api_key) if default_api_key else None
+
+
+# Smithery server function with config schema
+@smithery.server(config_schema=ConfigSchema)
+def create_server(config: Optional[ConfigSchema] = None) -> FastMCP:
+    """
+    Create and return the FastMCP server instance for Smithery deployment.
+
+    Args:
+        config: Configuration object with api_key
+
+    Returns:
+        Configured FastMCP server instance
+    """
+    global scrapegraph_client
+
+    # Get API key from config or environment
+    api_key = None
+    if config and hasattr(config, 'api_key'):
+        api_key = config.api_key
+    else:
+        api_key = os.environ.get("SGAI_API_KEY")
+
+    # Initialize client if API key is available
+    if api_key:
+        scrapegraph_client = ScapeGraphClient(api_key)
+
+    return mcp
 
 
 # Add tool for markdownify
