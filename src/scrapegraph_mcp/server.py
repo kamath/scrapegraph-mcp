@@ -36,6 +36,7 @@ class ScapeGraphClient:
         }
         self.client = httpx.Client(timeout=httpx.Timeout(120.0))
 
+
     def markdownify(self, website_url: str) -> Dict[str, Any]:
         """
         Convert a webpage into clean, formatted markdown.
