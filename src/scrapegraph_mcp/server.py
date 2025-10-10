@@ -15,6 +15,7 @@ from typing import Any, Dict, Optional, List, Union
 
 import httpx
 from fastmcp import FastMCP
+from smithery.decorators import smithery
 
 
 class ScapeGraphClient:
@@ -556,6 +557,47 @@ def agentic_scrapper(
         return {"error": str(val_err)}
 
 
+# Config schema for Smithery
+CONFIG_SCHEMA = {
+    "type": "object",
+    "required": ["scrapegraphApiKey"],
+    "properties": {
+        "scrapegraphApiKey": {
+            "type": "string",
+            "description": "Your Scrapegraph API key"
+        }
+    }
+}
+
+
+@smithery.server(config_schema=CONFIG_SCHEMA)
+def create_server(config: Optional[Dict[str, Any]] = None) -> FastMCP:
+    """
+    Create and return the FastMCP server instance for Smithery deployment.
+
+    Args:
+        config: Configuration dictionary with optional keys:
+            - scrapegraphApiKey: API key for ScapeGraph API
+
+    Returns:
+        Configured FastMCP server instance
+    """
+    global scrapegraph_client
+
+    # Get API key from config or environment
+    api_key = None
+    if config and "scrapegraphApiKey" in config:
+        api_key = config["scrapegraphApiKey"]
+    else:
+        api_key = os.environ.get("SGAI_API_KEY")
+
+    # Initialize client if API key is available
+    if api_key:
+        scrapegraph_client = ScapeGraphClient(api_key)
+
+    return mcp
+
+
 def main() -> None:
     """Run the ScapeGraph MCP server."""
     print("Starting ScapeGraph MCP server!")
@@ -564,4 +606,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main() 
+    main()

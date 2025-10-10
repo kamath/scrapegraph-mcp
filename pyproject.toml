@@ -11,6 +11,7 @@ requires-python = ">=3.10"
 dependencies = [
     "fastmcp>=2.0.0",
     "httpx>=0.24.0",
+    "smithery>=0.1.0",
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -54,4 +55,7 @@ python_version = "3.12"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
-disallow_incomplete_defs = true 
+disallow_incomplete_defs = true
+
+[tool.smithery]
+server = "scrapegraph_mcp.server:create_server"

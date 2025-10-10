@@ -37,8 +37,5 @@ env/
 .env
 .env.local
 
-# Node-generated files (if any)
-node_modules/
-
 # Logs
 *.log
